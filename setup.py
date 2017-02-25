@@ -4,15 +4,15 @@ except ImportError:
     from distutils.core import setup
 
 config = {
-    'description': 'Playlist Manager',
+    'description': 'Lil Python project',
     'author': 'Sara Perry',
     'url': '',
     'author_email': 'paraserry@gmail.com',
     'version': '0.1',
     'install_requires': ['nose'],
-    'packages': ['playlist'],
+    'packages': ['collection'],
     'scripts': [],
-    'name': 'Playlist Manager'
+    'name': 'Music Collection Manager'
 }
 
 setup(**config)

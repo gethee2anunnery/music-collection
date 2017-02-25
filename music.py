@@ -1,10 +1,9 @@
 #!/usr/local/bin/python
 
 import sys
-from playlist.playlist import PlayList
-
+from collection.collection import Collection
 
 
 if __name__ == '__main__':
-    PlayList().start()
+    Collection().start()
 

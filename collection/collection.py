@@ -25,9 +25,10 @@ class Song(object):
     def __str__(self):
         return "%s - %s" %(self.title, self.artist)
 
-class PlayList(object):
+class Collection(object):
 
     def get_song_by_title(self, title):
+        #MAY NOT NEED
         return next((x for x in self.songs if x.title == title), None)
 
     def get_songs(self, **kwargs):
@@ -36,7 +37,7 @@ class PlayList(object):
         # make this filterable by artist
         print artist
         print title
-        return next((x for x in self.songs if x.artist == artist), None)
+        #return next((x for x in self.songs if x.artist == artist), None)
 
     def start(self):
         print 'Welcome to your music collection!'
@@ -67,7 +68,7 @@ class PlayList(object):
         song_obj = self.get_songs(title=song_title)
 
         if song_obj:
-            print "This song is already in the playlist. "\
+            print "This song is already in the collection. "\
                    "Please add a different one."
             self.prompt_input()
         else:
@@ -76,38 +77,40 @@ class PlayList(object):
             print 'Added "%s" by %s' %(song.title, song.artist)
 
     def prompt_input(self):
-        action = raw_input("> ")
-        if action == 'quit':
+        command = raw_input("> ")
+        if command == 'quit':
             print "Bye!"
             sys.exit()
-        self.build_kwargs(action)
+        self.build_kwargs(command)
+
+
+    def handle_command(self, command, *args):
+        if command in VALID_COMMANDS:
+            #can i map a kw to a function
+            #{action: handler_fcuntion}
+            #http://stackoverflow.com/questions/13499824/using-python-map-function-with-keyword-arguments
+            if command == 'add':
+                self.add_song(*args)
+            elif command == 'show':
+                self.show_songs(*args)
+            elif command == 'play':
+                self.play_song(*args)
+        else:
+            print "That is not a valid command. Commands are: %s" %(', '.join(VALID_COMMANDS))
+            self.prompt_input()
 
 
     def build_kwargs(self, string_input):
         split_string =  [s.strip() for s in shlex.split(string_input)]
         command = split_string[0].lower()
         kwargs = {'cmd':command, 'args':split_string[1:]}
-        self.parse_kwargs(**kwargs)
+        self.parse_kwargs_to_command(**kwargs)
 
 
-    def parse_kwargs(self, **kwargs):
-        action = kwargs.get('cmd')
+    def parse_kwargs_to_command(self, **kwargs):
+        command = kwargs.get('cmd')
         args = kwargs.get('args')
-
-        if action in VALID_COMMANDS:
-            if action == 'add':
-                self.add_song(*args)
-            elif action == 'show':
-                self.show_songs(*args)
-            elif action == 'play':
-                self.play_song(*args)
-        else:
-            print "That is not a valid action. Commands are: %s" %(', '.join(VALID_COMMANDS))
-            self.prompt_input()
-
-
-
-
+        self.handle_command(command, *args)
 
 
     def __init__(self):
