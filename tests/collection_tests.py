@@ -1,5 +1,5 @@
 from nose.tools import *
-from .collection import collection
+from collection.collection import Collection, Album
 
 def setup():
     print "SETUP!"

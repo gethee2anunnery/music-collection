@@ -6,7 +6,9 @@ import shlex
 VALID_COMMANDS = ['add', 'show', 'play', 'quit']
 
 
-class Song(object):
+
+
+class Album(object):
 
     @property
     def status(self):
@@ -16,6 +18,7 @@ class Song(object):
     def play(self):
         self.played = True
         print 'You are listening to "%s"' %self.title
+
 
     def __init__(self, title, artist):
         self.title = title
@@ -27,54 +30,104 @@ class Song(object):
 
 class Collection(object):
 
-    def get_song_by_title(self, title):
-        #MAY NOT NEED
-        return next((x for x in self.songs if x.title == title), None)
-
-    def get_songs(self, **kwargs):
-        title = kwargs.pop('title')
-        artist = kwargs.pop('artist')
-        # make this filterable by artist
-        print artist
-        print title
-        #return next((x for x in self.songs if x.artist == artist), None)
-
     def start(self):
         print 'Welcome to your music collection!'
         self.prompt_input()
 
-    def get_played(self, **kwargs):
-        return [song for song in self.get_songs(**kwargs) if song.played]
 
-    def get_unplayed(self, **kwargs):
-        return [song for song in self.get_songs(**kwargs) if not song.played]
+    def filter_albums_by_kwargs(self, **kwargs):
+        title = kwargs.pop('title', None)
+        artist = kwargs.pop('artist', None)
+        played = kwargs.pop('played', True)
+        unplayed = kwargs.pop('unplayed', True)
+        filtered_list = self.albums
 
-    def play_song(self, *args):
-        song_title = args[0]
-        song = self.get_songs(title=song_title)
+        # filter by artist and title
+        if artist:
+            filtered_list = [album for album in filtered_list if album.artist == artist]
+        elif title:
+            filtered_list = [album for album in filtered_list if album.title == title]
 
-        if song:
-            song.play()
+        # filter by played and unplayed
+        if not played:
+            filtered_list = [album for album in filtered_list if not album.played]
+        if not unplayed:
+            filtered_list = [album for album in filtered_list if album.played]
+
+        return filtered_list
+
+
+    def album_count(self):
+        return len(self.albums)
+
+
+    def play_album(self, *args):
+        album_title = args[0]
+        album = self.filter_albums_by_kwargs(title=album_title)
+
+        if album:
+            album[0].play()
         else:
-            print self.songs
-            print "where's the song"
+            print 'You must add "%s" before playing.' % album_title
 
-    def show_songs(self, *args):
-        print args
+        self.prompt_input()
 
-    def add_song(self, *args):
-        song_title = args[0]
-        song_artist = args[-1]
-        song_obj = self.get_songs(title=song_title)
+    def show_albums(self, *args):
 
-        if song_obj:
-            print "This song is already in the collection. "\
-                   "Please add a different one."
-            self.prompt_input()
+        # parse the args to 'show' and get a filtered list
+        inclusion_param = args[0]
+        played = inclusion_param == 'all' or inclusion_param == 'played'
+        unplayed = inclusion_param == 'all' or inclusion_param == 'unplayed'
+
+        # if we find an artist param to filter by, add that
+        artist = args[-1] if args[-1] != args[0] else None
+
+        # get a filtered album list and pass to a
+        # printer function or return a message
+        albums_to_show = self.filter_albums_by_kwargs(played=played,
+                                                      unplayed=unplayed,
+                                                      artist=artist)
+        if len(albums_to_show) > 0:
+            self.print_albums(albumns_to_show, played=played, unplayed=unplayed)
         else:
-            song = Song(song_title, song_artist)
-            self.songs.append(song)
-            print 'Added "%s" by %s' %(song.title, song.artist)
+            print "There are no matching albums to show."
+
+        self.prompt_input()
+
+    def print_albums(self, album_list, **kwargs):
+        #TODO: do some logic in here about if to show the status
+        played = kwargs.pop('played')
+        unplayed = kwargs.pop('unplayed')
+        print "played %s unplayed %s" %(played, unplayed)
+
+        for album in album_list:
+            print '"%s" by %s (%s)' % (album.title, album.artist, album.status)
+
+
+    def add_album(self, *args):
+        is_valid_input = len(args) == 2
+
+        # if not 2 arguments (title and artist), error
+        # else, parse the args and either create and add
+        # a new album or raise a duplicate error
+
+        if not is_valid_input:
+            print 'Please provide a valid artist and title in the '\
+                   'format: "add "The Dark Side of the Moon" "Pink Floyd"" '
+        else:
+            album_title = args[0]
+            album_artist = args[-1]
+            album_obj = self.filter_albums_by_kwargs(title=album_title)
+
+            if album_obj:
+                print "This album is already in the collection. "\
+                       "Please add a different one."
+            else:
+                album = Album(album_title, album_artist)
+                self.albums.append(album)
+                print 'Added "%s" by %s' %(album.title, album.artist)
+
+        self.prompt_input()
 
     def prompt_input(self):
         command = raw_input("> ")
@@ -85,22 +138,23 @@ class Collection(object):
 
 
     def handle_command(self, command, *args):
+        # validate against the list of available commands
+        # and call the corresponding function
         if command in VALID_COMMANDS:
-            #can i map a kw to a function
-            #{action: handler_fcuntion}
-            #http://stackoverflow.com/questions/13499824/using-python-map-function-with-keyword-arguments
             if command == 'add':
-                self.add_song(*args)
+                self.add_album(*args)
             elif command == 'show':
-                self.show_songs(*args)
+                self.show_albums(*args)
             elif command == 'play':
-                self.play_song(*args)
+                self.play_album(*args)
         else:
-            print "That is not a valid command. Commands are: %s" %(', '.join(VALID_COMMANDS))
+            print "That is not a valid command. "\
+                  "Commands are: %s" %(', '.join(VALID_COMMANDS))
             self.prompt_input()
 
 
     def build_kwargs(self, string_input):
+        # build the command kwargs from the input
         split_string =  [s.strip() for s in shlex.split(string_input)]
         command = split_string[0].lower()
         kwargs = {'cmd':command, 'args':split_string[1:]}
@@ -108,11 +162,13 @@ class Collection(object):
 
 
     def parse_kwargs_to_command(self, **kwargs):
+        # parse the command from its 'arguments' and
+        # pass to a handler function
         command = kwargs.get('cmd')
         args = kwargs.get('args')
         self.handle_command(command, *args)
 
 
     def __init__(self):
-        self.songs = []
+        self.albums = []
 
