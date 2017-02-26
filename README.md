@@ -23,8 +23,11 @@ Added "The Dark Side of the Moon" by Pink Floyd
 \>>> show all
 
 "Ride the Lightning" by Metallica (unplayed)
+
 "Licensed to Ill" by Beastie Boys (unplayed)
+
 "Pauls Boutique" by Beastie Boys (unplayed)
+
 "The Dark Side of the Moon" by Pink Floyd (unplayed)
 
 \>>> play "Licensed to Ill"
@@ -38,8 +41,11 @@ You're listening to "The Dark Side of the Moon"
 \>>> show all
 
 "Ride the Lightning" by Metallica (unplayed)
+
 "Licensed to Ill" by Beastie Boys (played)
+
 "Pauls Boutique" by Beastie Boys (unplayed)
+
 "The Dark Side of the Moon" by Pink Floyd (played)
 
 \>>> show unplayed
@@ -50,6 +56,7 @@ You're listening to "The Dark Side of the Moon"
 \>>> show all by "Beastie Boys"
 
 "Licensed to Ill" by Beastie Boys (played)
+
 "Pauls Boutique" by Beastie Boys (unplayed)
 
 \>>> show unplayed by "Beastie Boys"
