@@ -3,10 +3,6 @@
 import sys
 import shlex
 
-VALID_COMMANDS = ['add', 'show', 'play', 'quit']
-
-
-
 
 class Album(object):
 
@@ -19,7 +15,6 @@ class Album(object):
         self.played = True
         print 'You are listening to "%s"' %self.title
 
-
     def __init__(self, title, artist):
         self.title = title
         self.artist = artist
@@ -29,11 +24,11 @@ class Album(object):
         return "%s - %s" %(self.title, self.artist)
 
 class Collection(object):
+    VALID_COMMANDS = ['add', 'show', 'play', 'quit']
 
     def start(self):
         print 'Welcome to your music collection!'
         self.prompt_input()
-
 
     def filter_albums_by_kwargs(self, **kwargs):
         title = kwargs.pop('title', None)
@@ -56,10 +51,8 @@ class Collection(object):
 
         return filtered_list
 
-
     def album_count(self):
         return len(self.albums)
-
 
     def play_album(self, *args):
         album_title = args[0]
@@ -103,7 +96,6 @@ class Collection(object):
         for album in album_list:
             print '"%s" by %s (%s)' % (album.title, album.artist, album.status)
 
-
     def add_album(self, *args):
         is_valid_input = len(args) == 2
 
@@ -136,11 +128,10 @@ class Collection(object):
             sys.exit()
         self.build_kwargs(command)
 
-
     def handle_command(self, command, *args):
         # validate against the list of available commands
         # and call the corresponding function
-        if command in VALID_COMMANDS:
+        if command in self.VALID_COMMANDS:
             if command == 'add':
                 self.add_album(*args)
             elif command == 'show':
@@ -149,9 +140,8 @@ class Collection(object):
                 self.play_album(*args)
         else:
             print "That is not a valid command. "\
-                  "Commands are: %s" %(', '.join(VALID_COMMANDS))
+                  "Commands are: %s" %(', '.join(self.VALID_COMMANDS))
             self.prompt_input()
-
 
     def build_kwargs(self, string_input):
         # build the command kwargs from the input
@@ -160,14 +150,12 @@ class Collection(object):
         kwargs = {'cmd':command, 'args':split_string[1:]}
         self.parse_kwargs_to_command(**kwargs)
 
-
     def parse_kwargs_to_command(self, **kwargs):
         # parse the command from its 'arguments' and
         # pass to a handler function
         command = kwargs.get('cmd')
         args = kwargs.get('args')
         self.handle_command(command, *args)
-
 
     def __init__(self):
         self.albums = []
