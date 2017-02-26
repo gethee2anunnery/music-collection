@@ -1,7 +1,5 @@
 #!/usr/local/bin/python
 
-import sys
-import shlex
 
 
 class Album(object):
@@ -24,11 +22,6 @@ class Album(object):
         return "%s - %s" %(self.title, self.artist)
 
 class Collection(object):
-    VALID_COMMANDS = ['add', 'show', 'play', 'quit']
-
-    def start(self):
-        print 'Welcome to your music collection!'
-        self.prompt_input()
 
     def filter_albums_by_kwargs(self, **kwargs):
         title = kwargs.pop('title', None)
@@ -61,9 +54,7 @@ class Collection(object):
         if album:
             album[0].play()
         else:
-            print 'You must add "%s" before playing.' % album_title
-
-        self.prompt_input()
+            raise Exception('You must add "%s" before playing.' % album_title)
 
     def show_albums(self, *args):
 
@@ -81,11 +72,12 @@ class Collection(object):
                                                       unplayed=unplayed,
                                                       artist=artist)
         if len(albums_to_show) > 0:
-            self.print_albums(albumns_to_show, played=played, unplayed=unplayed)
+            self.print_albums(albums_to_show,
+                              played=played,
+                              unplayed=unplayed)
         else:
-            print "There are no matching albums to show."
+            raise Exception("There are no matching albums to show.")
 
-        self.prompt_input()
 
     def print_albums(self, album_list, **kwargs):
         #TODO: do some logic in here about if to show the status
@@ -104,59 +96,70 @@ class Collection(object):
         # a new album or raise a duplicate error
 
         if not is_valid_input:
-            print 'Please provide a valid artist and title in the '\
-                   'format: "add "The Dark Side of the Moon" "Pink Floyd"" '
+            raise Exception('Please provide a valid artist and title')
         else:
             album_title = args[0]
             album_artist = args[-1]
             album_obj = self.filter_albums_by_kwargs(title=album_title)
 
             if album_obj:
-                print "This album is already in the collection. "\
-                       "Please add a different one."
+                raise Exception("This album is already in the collection. "\
+                       "Please add a different one.")
             else:
                 album = Album(album_title, album_artist)
                 self.albums.append(album)
                 print 'Added "%s" by %s' %(album.title, album.artist)
 
-        self.prompt_input()
 
-    def prompt_input(self):
-        command = raw_input("> ")
-        if command == 'quit':
-            print "Bye!"
-            sys.exit()
-        self.build_kwargs(command)
+    # def prompt_input(self):
+    #     use_raw_input = self.kwargs.get('raw_input', True)
+    #     if use_raw_input:
+    #         command = raw_input("> ")
+    #         if command == 'quit':
+    #             print "Bye!"
+    #             sys.exit()
+    #         self.build_kwargs(command)
+    #     else:
+    #         # skip inputs for tests
+    #         pass
 
-    def handle_command(self, command, *args):
-        # validate against the list of available commands
-        # and call the corresponding function
-        if command in self.VALID_COMMANDS:
-            if command == 'add':
-                self.add_album(*args)
-            elif command == 'show':
-                self.show_albums(*args)
-            elif command == 'play':
-                self.play_album(*args)
-        else:
-            print "That is not a valid command. "\
-                  "Commands are: %s" %(', '.join(self.VALID_COMMANDS))
-            self.prompt_input()
+    # def handle_command(self, command, *args):
+    #     # validate against the list of available commands
+    #     # and call the corresponding function
+    #     if command in self.VALID_COMMANDS:
+    #         try:
+    #             if command == 'add':
+    #                 self.add_album(*args)
+    #             elif command == 'show':
+    #                 self.show_albums(*args)
+    #             elif command == 'play':
+    #                 self.play_album(*args)
+    #             self.prompt_input()
 
-    def build_kwargs(self, string_input):
-        # build the command kwargs from the input
-        split_string =  [s.strip() for s in shlex.split(string_input)]
-        command = split_string[0].lower()
-        kwargs = {'cmd':command, 'args':split_string[1:]}
-        self.parse_kwargs_to_command(**kwargs)
+    #         except Exception as e:
+    #             print e
+    #             self.prompt_input()
 
-    def parse_kwargs_to_command(self, **kwargs):
-        # parse the command from its 'arguments' and
-        # pass to a handler function
-        command = kwargs.get('cmd')
-        args = kwargs.get('args')
-        self.handle_command(command, *args)
+    #     else:
+    #         print "That is not a valid command. "\
+    #               "Commands are: %s" %(', '.join(self.VALID_COMMANDS))
+    #         self.prompt_input()
 
-    def __init__(self):
+    # def build_kwargs(self, string_input):
+    #     # build the command kwargs from the input
+    #     split_string =  [s.strip() for s in shlex.split(string_input)]
+    #     command = split_string[0].lower()
+    #     kwargs = {'cmd':command, 'args':split_string[1:]}
+    #     self.parse_kwargs_to_command(**kwargs)
+
+    # def parse_kwargs_to_command(self, **kwargs):
+    #     # parse the command from its 'arguments' and
+    #     # pass to a handler function
+    #     command = kwargs.get('cmd')
+    #     args = kwargs.get('args')
+    #     self.handle_command(command, *args)
+
+    def __init__(self, **kwargs):
+        self.kwargs = kwargs
         self.albums = []
 
