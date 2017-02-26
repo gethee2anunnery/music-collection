@@ -1,6 +1,6 @@
 # Music Collection
 
-## This is a Python script. From the project root, run 'python music.py' and you can interact with it on the command line, like so:
+## This is a Python script. From the top level, run 'python music.py' and you can interact with it on the command line, like so:
 
 Welcome to your music collection!
 
