@@ -23,6 +23,11 @@ class Album(object):
 
 class Collection(object):
 
+    def get_album_status(self, album_name):
+        album = self.filter_albums_by_kwargs(title=album_name)
+        if album:
+            return album[0].status
+
     def filter_albums_by_kwargs(self, **kwargs):
         title = kwargs.pop('title', None)
         artist = kwargs.pop('artist', None)
@@ -44,8 +49,9 @@ class Collection(object):
 
         return filtered_list
 
-    def album_count(self):
-        return len(self.albums)
+    def album_count(self, **kwargs):
+        return len(self.filter_albums_by_kwargs(**kwargs))
+
 
     def play_album(self, *args):
         album_title = args[0]
@@ -83,7 +89,7 @@ class Collection(object):
         #TODO: do some logic in here about if to show the status
         played = kwargs.pop('played')
         unplayed = kwargs.pop('unplayed')
-        print "played %s unplayed %s" %(played, unplayed)
+        # print "played %s unplayed %s" %(played, unplayed)
 
         for album in album_list:
             print '"%s" by %s (%s)' % (album.title, album.artist, album.status)

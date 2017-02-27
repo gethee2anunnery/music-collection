@@ -5,7 +5,7 @@ import shlex
 from collection.collection import Collection
 
 
-class CollectionParser(object):
+class CollectionCommandLineParser(object):
     VALID_COMMANDS = ['add', 'show', 'play', 'quit']
 
     def start(self):
@@ -36,38 +36,35 @@ class CollectionParser(object):
         # pass to a handler function
         command = kwargs.get('cmd')
         args = kwargs.get('args')
-        self.handle_command(command, *args)
+        try:
+            self.handle_command(command, *args)
+        except Exception as e:
+            print e
+            self.prompt_input()
 
     def handle_command(self, command, *args):
         # validate against the list of available commands
         # and call the corresponding function
         if command in self.VALID_COMMANDS:
-            try:
-                if command == 'add':
-                    self.collection.add_album(*args)
-                elif command == 'show':
-                    self.collection.show_albums(*args)
-                elif command == 'play':
-                    self.collection.play_album(*args)
-                self.prompt_input()
-
-            except Exception as e:
-                print e
-                self.prompt_input()
-
-        else:
-            print "That is not a valid command. "\
-                  "Commands are: %s" %(', '.join(self.VALID_COMMANDS))
+            if command == 'add':
+                self.collection.add_album(*args)
+            elif command == 'show':
+                self.collection.show_albums(*args)
+            elif command == 'play':
+                self.collection.play_album(*args)
             self.prompt_input()
+        else:
+            raise Exception("That is not a valid command. "\
+              "Commands are: %s" %(', '.join(self.VALID_COMMANDS)))
+
 
     def __init__(self, **kwargs):
         self.kwargs = kwargs
         self.collection = Collection()
 
 
-
 def main(**kwargs):
-    parser = CollectionParser(**kwargs)
+    parser = CollectionCommandLineParser(**kwargs)
     parser.start()
 
 
