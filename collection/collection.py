@@ -91,7 +91,6 @@ class Collection(object):
         # print list of albums with played status or not
         played = kwargs.pop('played')
         unplayed = kwargs.pop('unplayed')
-        print 'played %s unplayed %s' % (played, unplayed)
 
         show_status = (played == True) and (unplayed == True)
 

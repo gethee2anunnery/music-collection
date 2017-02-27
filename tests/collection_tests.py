@@ -65,7 +65,7 @@ class TestCollection(object):
         # loop through the output and compare if to the
         # list of test album data
         for i, a in enumerate(output_pieces, start=0):
-            title, artist = self.album_data[i]['title'],
+            title, artist = self.album_data[i]['title'],\
                             self.album_data[i]['artist']
             assert_in(title, a)
             assert_in(artist, a)
