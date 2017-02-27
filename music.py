@@ -7,6 +7,7 @@ from collection.collection import Collection
 
 class CollectionCommandLineParser(object):
     VALID_COMMANDS = ['add', 'show', 'play', 'quit']
+    VALID_SHOW_PARAMS = ['all', 'played', 'unplayed']
 
     def start(self):
         print 'Welcome to your music collection!'
@@ -48,8 +49,17 @@ class CollectionCommandLineParser(object):
         if command in self.VALID_COMMANDS:
             if command == 'add':
                 self.collection.add_album(*args)
+
             elif command == 'show':
-                self.collection.show_albums(*args)
+                inclusion_param = args[0]
+
+                if inclusion_param in self.VALID_SHOW_PARAMS:
+                    self.collection.show_albums(*args)
+                else:
+                    raise Exception("%s is not a valid argument to 'show'. "\
+                    "Choices are: %s" %(inclusion_param,\
+                    ', '.join(self.VALID_SHOW_PARAMS)))
+
             elif command == 'play':
                 self.collection.play_album(*args)
             self.prompt_input()
