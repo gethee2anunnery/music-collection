@@ -81,22 +81,22 @@ class Collection(object):
                                                       unplayed=unplayed,
                                                       artist=artist)
         if len(albums_to_show) > 0:
-            self.print_albums(albums_to_show,
+            self.print_albums(*albums_to_show,
                               played=played,
                               unplayed=unplayed)
         else:
             raise Exception("There are no matching albums to show.")
 
-    def print_albums(self, album_list, **kwargs):
+    def print_albums(self, *args, **kwargs):
         # print list of albums with played status or not
-        played = kwargs.pop('played')
-        unplayed = kwargs.pop('unplayed')
+        played = kwargs.pop('played', True)
+        unplayed = kwargs.pop('unplayed', True)
 
         show_status = (played == True) and (unplayed == True)
 
-        for album in album_list:
-            status = "(%s)" % album.status if show_status else ''
-            print '"%s" by %s %s' % (album.title, album.artist, status)
+        for a in args:
+            status = "(%s)" % a.status if show_status else ''
+            print '"%s" by %s %s' % (a.title, a.artist, status)
 
     def add_album(self, *args):
         is_valid_input = len(args) == 2
@@ -106,7 +106,8 @@ class Collection(object):
         # a new album or raise a duplicate error
 
         if not is_valid_input:
-            raise Exception('Please provide a valid artist and title')
+            raise Exception('Please provide a valid artist and title'
+                            ' ex format: "Songname" "Album"')
         else:
             album_title = args[0]
             album_artist = args[-1]

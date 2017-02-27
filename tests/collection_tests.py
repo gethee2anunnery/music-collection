@@ -44,6 +44,15 @@ class TestCollection(object):
         album_count = self.parser.collection.album_count()
         assert_equal(album_count, len(self.album_data))
 
+    def test_add_invalid(self):
+        # grab a random album from the data
+        # and try to add it without the ""
+        album = self.album_data[0]
+        command_str = 'add %s %s' % (album['title'], album['artist'])
+        output = self.call_command(command_str)
+        expected_output = 'Please provide a valid artist and title'
+        assert_in(expected_output, output)
+
     def test_play(self):
         for album in self.album_data[:self.play_index]:
             command_str = 'Play "%s"' % (album['title'])
@@ -70,26 +79,23 @@ class TestCollection(object):
             assert_in(title, a)
             assert_in(artist, a)
 
-        # compare the number of albums in collection
-        # to the number of lines in the output
+        # compare collection to output
         album_count = self.parser.collection.album_count()
         assert_equal(album_count, len(output_pieces))
 
-        # compare to test data
+        # compare collection to test data
         assert_equal(album_count, len(self.album_data))
 
     def test_show_played(self):
-        # compare the number of played albums in collection
-        # to the number of lines in the output
         command_str = 'show played'
         output = self.call_command(command_str)
         output_pieces = output.split('\n')
         played_count = self.parser.collection.album_count(played=True,
                                                           unplayed=False)
-        # compared to output
+        # compare played collection to output
         assert_equal(played_count, len(output_pieces))
 
-        # compared to test data
+        # compare to test data
         assert_equal(played_count, self.play_index)
 
     def test_show_unplayed(self):
@@ -98,10 +104,10 @@ class TestCollection(object):
         output_pieces = output.split('\n')
         unplayed_count = self.parser.collection.album_count(played=False,
                                                             unplayed=True)
-        # compared to output
+        # compare unplayed to output
         assert_equal(unplayed_count, len(output_pieces))
 
-        # compared to test data
+        # compare to test data
         assert_equal(unplayed_count, len(self.album_data) - self.play_index)
 
     def test_invalid_show_arg(self):
