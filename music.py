@@ -13,13 +13,22 @@ class CollectionCommandLineParser(object):
         print 'Welcome to your music collection!'
         self.prompt_input()
 
+    def exit(self):
+        print "Bye!"
+        sys.exit()
+
     def prompt_input(self):
         use_raw_input = self.kwargs.get('raw_input', True)
         if use_raw_input:
-            command = raw_input("> ")
-            if command == 'quit':
-                print "Bye!"
-                sys.exit()
+            try:
+                command = raw_input("> ")
+                if command == 'quit':
+                    self.exit()
+            except KeyboardInterrupt:
+                self.exit()
+            except EOFError:
+                self.exit()
+
             self.build_kwargs(command)
         else:
             # skip inputs for tests
@@ -27,9 +36,9 @@ class CollectionCommandLineParser(object):
 
     def build_kwargs(self, string_input):
         # build the command kwargs from the input
-        split_string =  [s.strip() for s in shlex.split(string_input)]
+        split_string = [s.strip() for s in shlex.split(string_input)]
         command = split_string[0].lower()
-        kwargs = {'cmd':command, 'args':split_string[1:]}
+        kwargs = {'cmd': command, 'args': split_string[1:]}
         self.parse_kwargs_to_command(**kwargs)
 
     def parse_kwargs_to_command(self, **kwargs):
@@ -56,17 +65,18 @@ class CollectionCommandLineParser(object):
                 if inclusion_param in self.VALID_SHOW_PARAMS:
                     self.collection.show_albums(*args)
                 else:
-                    raise Exception("%s is not a valid argument to 'show'. "\
-                    "Choices are: %s" %(inclusion_param,\
-                    ', '.join(self.VALID_SHOW_PARAMS)))
+                    raise Exception("%s is not a valid "
+                                    "argument to 'show'. "
+                                    "Choices are: %s" % (inclusion_param,
+                                    ', '.join(self.VALID_SHOW_PARAMS)))
 
             elif command == 'play':
                 self.collection.play_album(*args)
             self.prompt_input()
         else:
-            raise Exception("That is not a valid command. "\
-              "Commands are: %s" %(', '.join(self.VALID_COMMANDS)))
-
+            raise Exception("That is not a valid command. "
+                            "Commands are: %s" %
+                            (', '.join(self.VALID_COMMANDS)))
 
     def __init__(self, **kwargs):
         self.kwargs = kwargs
@@ -80,5 +90,3 @@ def main(**kwargs):
 
 if __name__ == '__main__':
     main(raw_input=True)
-
-

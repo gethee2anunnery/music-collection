@@ -1,7 +1,6 @@
 #!/usr/local/bin/python
 
 
-
 class Album(object):
 
     @property
@@ -11,7 +10,7 @@ class Album(object):
 
     def play(self):
         self.played = True
-        print 'You are listening to "%s"' %self.title
+        print 'You are listening to "%s"' % self.title
 
     def __init__(self, title, artist):
         self.title = title
@@ -19,7 +18,8 @@ class Album(object):
         self.played = False
 
     def __str__(self):
-        return "%s - %s" %(self.title, self.artist)
+        return "%s - %s" % (self.title, self.artist)
+
 
 class Collection(object):
 
@@ -37,25 +37,24 @@ class Collection(object):
 
         # filter by artist and title
         if artist:
-            filtered_list = [album for album in filtered_list \
+            filtered_list = [album for album in filtered_list
                              if album.artist == artist]
         elif title:
-            filtered_list = [album for album in filtered_list \
+            filtered_list = [album for album in filtered_list
                              if album.title == title]
 
         # filter by played and unplayed
         if not played:
-            filtered_list = [album for album in filtered_list\
+            filtered_list = [album for album in filtered_list
                              if not album.played]
         if not unplayed:
-            filtered_list = [album for album in filtered_list\
+            filtered_list = [album for album in filtered_list
                              if album.played]
 
         return filtered_list
 
     def album_count(self, **kwargs):
         return len(self.filter_albums_by_kwargs(**kwargs))
-
 
     def play_album(self, *args):
         album_title = args[0]
@@ -88,12 +87,13 @@ class Collection(object):
         else:
             raise Exception("There are no matching albums to show.")
 
-
     def print_albums(self, album_list, **kwargs):
         # print list of albums with played status or not
         played = kwargs.pop('played')
         unplayed = kwargs.pop('unplayed')
-        show_status = played != unplayed
+        print 'played %s unplayed %s' % (played, unplayed)
+
+        show_status = (played == True) and (unplayed == True)
 
         for album in album_list:
             status = "(%s)" % album.status if show_status else ''
@@ -114,15 +114,13 @@ class Collection(object):
             album_obj = self.filter_albums_by_kwargs(title=album_title)
 
             if album_obj:
-                raise Exception("This album is already in the collection. "\
-                       "Please add a different one.")
+                raise Exception("This album is already in the collection. "
+                                "Please add a different one.")
             else:
                 album = Album(album_title, album_artist)
                 self.albums.append(album)
-                print 'Added "%s" by %s' %(album.title, album.artist)
-
+                print 'Added "%s" by %s' % (album.title, album.artist)
 
     def __init__(self, **kwargs):
         self.kwargs = kwargs
         self.albums = []
-
